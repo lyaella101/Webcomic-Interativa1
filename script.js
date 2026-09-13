@@ -95,10 +95,7 @@
     observerArmario.observe(quadroArmario);
   }
 
-  // Chamado quando o teste de perícia falha: tudo que vinha depois do
-  // teste (inclusive a etapa de escolher roupa) some da leitura, e a
-  // rota ruim entra no lugar. Rolando pra cima, esses quadros não
-  // voltam a aparecer.
+  // Pra quando falhar no teste ele não aparecer os quadrinhos depois e da escolha de roupas
   function pularArmario() {
     if (escolhido) return;
 
@@ -183,11 +180,7 @@
   prepararAnimacoesScroll();
   armarCronometro();
 
-  /* Teste de perícia: um quadro à parte na leitura, sem ligação com a
-     escolha de roupa — mas o resultado dele decide, lá na frente, se a
-     leitura vai pra rota 3 (ruim) quando o leitor fecha o armário.
-     Um ponteiro gira sem parar em torno de um anel; travar dentro do
-     arco marcado é sucesso. */
+  /* Teste de perícia */
 
   const painelPericia = document.getElementById("teste-pericia");
 
