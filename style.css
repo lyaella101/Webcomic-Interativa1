@@ -1,0 +1,406 @@
+:root {
+  --primary-color: #fff;
+  --secondary-color: #000;
+  --accent-color: #84d9e4;
+  --apagado: #8a8a8a;
+  --font-family: "Arial", sans-serif;
+
+  --medianiz: 12px; /* espaço entre quadros */
+  --respiro: 2; /* multiplicador do espaço entre uma linha e outra */
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 1.5;
+  background-color: var(--secondary-color);
+  color: var(--primary-color);
+}
+
+/* !important porque .linha (display: flex) e a regra de mobile
+   (display: block) vêm depois no arquivo e, com a mesma especificidade,
+   venceriam o display: none e a linha continuaria aparecendo. */
+.escondido {
+  display: none !important;
+}
+
+/* Capa */
+
+.capa {
+  min-height: 100svh;
+  display: grid;
+  place-content: center;
+  gap: 1rem;
+  padding: 2rem;
+}
+.capa h1 {
+  margin: 0;
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  line-height: 1.05;
+}
+.capa p {
+  margin: 0;
+  max-width: 40ch;
+}
+.capa .comecar {
+  justify-self: start;
+  padding: 0.6rem 1.2rem;
+  border: 2px solid var(--primary-color);
+  background: var(--accent-color);
+  color: var(--secondary-color);
+  text-decoration: none;
+}
+.capa .comecar:hover {
+  background: var(--primary-color);
+}
+
+/* Largura: Tamanho de todos os quadrinhos (JUNTOS) em largura */
+
+#largura {
+  width: min(1400px, 94vw);
+  margin: 0 auto;
+  padding: 0 0 40vh;
+}
+
+/* Linha: cada linha de quadrinhos */
+
+.linha {
+  display: flex;
+  gap: var(--medianiz);
+  aspect-ratio: var(--p, 2/1);
+  margin-bottom: calc(var(--medianiz) * var(--respiro));
+}
+.linha.animar-scroll {
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+.linha.animar-scroll.visivel {
+  opacity: 1;
+}
+
+/* Sangria: atravessa a tela inteira, para os momentos de impacto */
+.linha.larga {
+  width: 100vw;
+  max-width: none;
+  margin-left: calc(50% - 50vw);
+}
+
+/* Pilha: empilha quadrinhos dentro de uma linha */
+.quadro,
+.pilha {
+  display: flex;
+  flex-direction: column;
+  gap: var(--medianiz);
+  flex: var(--peso, 1);
+  min-width: 0;
+}
+
+/* Quadro */
+
+.quadro {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid var(--primary-color);
+}
+.quadro img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.quadro.vazio {
+  display: grid;
+  place-content: center;
+  background-color: var(--primary-color);
+}
+.quadro.vazio::after {
+  content: "em produção";
+  color: var(--apagado);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
+
+.quadro-celular {
+  display: grid;
+  place-items: center;
+  padding: 6%;
+  background-color: var(--primary-color);
+}
+
+.celular {
+  position: relative;
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 9/16;
+}
+
+.celular-moldura {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.celular-tela {
+  position: absolute;
+  inset: var(--tela, 0);
+  overflow: hidden;
+  border: 1px solid var(--apagado);
+  background: var(--primary-color);
+}
+
+.celular-rolagem {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.celular-rolagem::-webkit-scrollbar {
+  display: none;
+}
+
+.celular-rolagem img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.celular-post {
+  width: 100%;
+  aspect-ratio: 3/4;
+  display: grid;
+  place-content: center;
+  border-bottom: 1px solid var(--apagado);
+}
+.celular-post::after {
+  content: "em produção";
+  color: var(--apagado);
+  font-size: 0.55rem;
+  letter-spacing: 0.05em;
+}
+.celular-post:last-child {
+  border-bottom: 0;
+}
+
+.quadro-armario {
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 1.25rem;
+  background-color: var(--secondary-color);
+}
+
+.quadro-armario.resolvida .gaveta {
+  opacity: 0.35;
+  pointer-events: none;
+}
+.quadro-armario.resolvida .cronometro {
+  visibility: hidden;
+}
+
+/* Cronômetro: só o número caindo */
+.cronometro {
+  text-align: center;
+}
+.cronometro b {
+  font-size: 1.3rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.gaveta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.roupa-item {
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--primary-color);
+  background: none;
+  color: var(--primary-color);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+.roupa-item:hover {
+  background: var(--accent-color);
+  color: var(--secondary-color);
+  border-color: var(--accent-color);
+}
+
+.roupa-item.secreto {
+  border-color: var(--apagado);
+  color: var(--apagado);
+  opacity: 0.25;
+}
+.roupa-item.secreto:hover,
+.roupa-item.secreto:focus-visible {
+  opacity: 1;
+  border-color: var(--accent-color);
+  background: var(--accent-color);
+  color: var(--secondary-color);
+}
+
+.quadro-pericia {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 0.85rem;
+  padding: 1.25rem;
+}
+
+.anel-pericia {
+  width: min(50%, 130px);
+}
+
+.anel-svg {
+  width: 100%;
+  aspect-ratio: 1;
+  transform: rotate(-90deg); /* 0° do SVG passa a apontar pra cima */
+}
+
+.anel-trilha {
+  fill: none;
+  stroke: var(--primary-color);
+  stroke-width: 6;
+  opacity: 0.25;
+}
+
+.anel-zona {
+  fill: none;
+  stroke: var(--accent-color);
+  stroke-width: 6;
+  stroke-linecap: butt;
+}
+
+.anel-ponteiro {
+  stroke: var(--primary-color);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.anel-centro {
+  fill: var(--primary-color);
+}
+
+.botao-pericia {
+  padding: 0.6rem 1.4rem;
+  border: 1px solid var(--accent-color);
+  background: none;
+  color: var(--primary-color);
+  font: inherit;
+  cursor: pointer;
+}
+.botao-pericia:hover {
+  background: var(--accent-color);
+  color: var(--secondary-color);
+}
+
+.quadro-pericia .resultado {
+  margin: 0;
+  min-height: 1.1em;
+  font-size: 0.85rem;
+  text-align: center;
+}
+.quadro-pericia.sucesso .resultado {
+  color: var(--accent-color);
+}
+.quadro-pericia.falha .resultado {
+  color: var(--apagado);
+}
+.quadro-pericia.sucesso .anel-trilha {
+  stroke: var(--accent-color);
+  opacity: 0.4;
+}
+.quadro-pericia.falha .anel-trilha {
+  stroke: var(--apagado);
+  opacity: 0.4;
+}
+
+.quadro-pericia.resolvido .botao-pericia {
+  display: none;
+}
+
+@media (min-width: 800px) {
+  .roupa-item {
+    min-width: 130px;
+  }
+}
+
+.rota p {
+  max-width: 40ch;
+  margin: 0 0 1.5rem;
+}
+
+.reiniciar {
+  padding: 0.6rem 1.2rem;
+  border: 2px solid var(--secondary-color);
+  background: var(--primary-color);
+  color: var(--secondary-color);
+  font: inherit;
+  cursor: pointer;
+}
+.reiniciar:hover {
+  background: var(--secondary-color);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.rota {
+  padding-bottom: 30vh;
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-color);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  #largura {
+    width: 100%;
+    padding: 0 0.75rem 40vh;
+  }
+  .linha,
+  .pilha {
+    display: block;
+    aspect-ratio: auto;
+  }
+  .linha.larga {
+    width: auto;
+    margin-left: 0;
+  }
+  .quadro {
+    aspect-ratio: 4/5;
+    margin-bottom: var(--medianiz);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .linha.animar-scroll {
+    transition: none;
+    opacity: 1;
+  }
+}

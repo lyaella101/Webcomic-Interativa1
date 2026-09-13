@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Webcomic interativa." />
+    <title>Protótipo</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+
+    <noscript>
+      <style>
+        .rota.escondido {
+          display: block;
+        }
+        .cronometro {
+          display: none;
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body>
+    <header class="capa">
+      <h1>Titulo</h1>
+      <p>textos textos textos</p>
+      <a class="comecar" href="#largura">Começar a ler</a>
+    </header>
+
+    <main id="largura">
+      <div class="linha" style="--p: 16/9">
+        <figure class="quadro vazio"></figure>
+      </div>
+
+      <div class="linha" style="--p: 3/1">
+        <figure class="quadro vazio"></figure>
+        <figure class="quadro vazio"></figure>
+        <figure class="quadro vazio"></figure>
+
+        <figure class="quadro quadro-pericia" id="teste-pericia">
+          <div class="anel-pericia escondido" id="anel-pericia">
+            <svg class="anel-svg" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="anel-trilha" cx="60" cy="60" r="50" />
+              <circle class="anel-zona" id="zona" cx="60" cy="60" r="50" />
+              <line
+                class="anel-ponteiro"
+                id="ponteiro"
+                x1="60"
+                y1="60"
+                x2="106"
+                y2="60"
+              />
+              <circle class="anel-centro" cx="60" cy="60" r="3" />
+            </svg>
+          </div>
+
+          <button type="button" class="botao-pericia" id="botao-pericia">
+            Clique
+          </button>
+
+          <p class="resultado" id="resultado-pericia" aria-live="polite"></p>
+        </figure>
+      </div>
+
+      <div class="linha pos-pericia" style="--p: 2/1">
+        <figure class="quadro vazio" style="--peso: 2"></figure>
+        <figure class="quadro vazio"></figure>
+        <figure class="quadro vazio"></figure>
+      </div>
+
+      <div class="linha pos-pericia" style="--p: 16/9">
+        <figure class="quadro vazio"></figure>
+
+        <figure class="quadro quadro-celular">
+          <div class="celular">
+            <!-- Moldura do celular (imagem de fora):
+                 <img class="celular-moldura" src="imagens/celular.png" alt="" /> -->
+
+            <div class="celular-tela">
+              <div class="celular-rolagem">
+                <!-- Imagens de dentro da tela: <img src="..." alt="" /> -->
+                <div class="celular-post"></div>
+                <div class="celular-post"></div>
+                <div class="celular-post"></div>
+                <div class="celular-post"></div>
+              </div>
+            </div>
+          </div>
+        </figure>
+      </div>
+
+      <div
+        class="linha linha-armario pos-pericia"
+        id="linha-armario"
+        style="--p: 2/1"
+      >
+        <figure class="quadro vazio"></figure>
+
+        <figure class="quadro quadro-armario" id="quadro-armario">
+          <div class="cronometro"><b id="contador"></b></div>
+
+          <div class="gaveta" id="gaveta">
+            <button type="button" class="roupa-item" data-roupa="roupa1">
+              Roupa 1
+            </button>
+            <button type="button" class="roupa-item" data-roupa="roupa2">
+              Roupa 2
+            </button>
+            <button type="button" class="roupa-item" data-roupa="roupa3">
+              Roupa 3
+            </button>
+
+            <!-- Objeto secreto -->
+            <button
+              type="button"
+              class="roupa-item secreto"
+              data-roupa="segredo"
+              aria-label="Algo no fundo do armário"
+            >
+              ?
+            </button>
+          </div>
+        </figure>
+      </div>
+
+      <section class="rota escondido" id="rota-roupa1">
+        <div class="linha" style="--p: 6/5">
+          <figure class="quadro vazio"></figure>
+          <div class="pilha">
+            <figure class="quadro vazio"></figure>
+            <figure class="quadro vazio"></figure>
+          </div>
+        </div>
+
+        <div class="linha" style="--p: 21/9">
+          <figure class="quadro vazio"></figure>
+        </div>
+
+        <div class="linha" style="--p: 16/9">
+          <figure class="quadro vazio"></figure>
+        </div>
+
+        <p>texto texto texto texto 1</p>
+        <button type="button" class="reiniciar">Ler novamente</button>
+      </section>
+
+      <section class="rota escondido" id="rota-roupa2">
+        <div class="linha" style="--p: 12/5">
+          <figure class="quadro vazio"></figure>
+          <figure class="quadro vazio"></figure>
+          <figure class="quadro vazio"></figure>
+        </div>
+
+        <div class="linha" style="--p: 16/9">
+          <figure class="quadro vazio"></figure>
+        </div>
+
+        <p>TEXTO 2.</p>
+        <button type="button" class="reiniciar">Ler novamente</button>
+      </section>
+
+      <!-- Rota 3: Se falhar no skillcheck OU escolher a roupa 3 -->
+      <section class="rota escondido" id="rota-roupa3">
+        <div class="linha" style="--p: 2/1">
+          <figure class="quadro vazio"></figure>
+          <figure class="quadro vazio"></figure>
+        </div>
+
+        <div class="linha" style="--p: 16/9">
+          <figure class="quadro vazio"></figure>
+        </div>
+
+        <p>TEXTO 3.</p>
+        <button type="button" class="reiniciar">Ler novamente</button>
+      </section>
+
+      <!-- Rota Segredo  -->
+      <section class="rota escondido" id="rota-segredo">
+        <div class="linha" style="--p: 3/1">
+          <figure class="quadro vazio"></figure>
+          <figure class="quadro vazio"></figure>
+          <figure class="quadro vazio"></figure>
+        </div>
+
+        <div class="linha" style="--p: 21/9">
+          <figure class="quadro vazio"></figure>
+        </div>
+
+        <div class="linha" style="--p: 16/9">
+          <figure class="quadro vazio"></figure>
+        </div>
+
+        <p>TEXTO 4 — final secreto.</p>
+        <button type="button" class="reiniciar">Ler novamente</button>
+      </section>
+    </main>
+  </body>
+</html>
