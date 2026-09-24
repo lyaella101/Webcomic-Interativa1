@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Webcomic interativa." />
+    <title>Webcomic Interativa - Atomik Bell</title>
+
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+
+    <noscript>
+      <style>
+        body.na-capa #largura {
+          display: block !important;
+        }
+        .rota {
+          display: block !important;
+        }
+        .cronometro-wrapper {
+          display: none;
+        }
+      </style>
+    </noscript>
+  </head>
+
+  <body class="na-capa">
+    <header class="capa">
+      <img
+        class="logo"
+        src="imagens/logo.svg"
+        alt="Atomic Bell"
+        width="720"
+        height="320"
+        decoding="async"
+      />
+      <a class="comecar" href="#largura" aria-label="Começar a ler"></a>
+    </header>
+
+    <main id="largura">
+      <img
+        class="pagina-img"
+        src="imagens/SQ1.jpg"
+        width="1220"
+        height="1700"
+        alt=""
+        loading="lazy"
+        decoding="async"
+      />
+
+      <audio id="som-alarme" src="audio/alarme.mp3" loop preload="auto"></audio>
+
+      <div class="cronometro-wrapper">
+        <div class="cronometro-barra">
+          <div class="cronometro-display">
+            <span id="contador"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="linha" style="--p: 5/2">
+        <figure class="quadro quadro-armario" id="quadro-armario">
+          <div class="gaveta" id="gaveta">
+            <button
+              type="button"
+              class="acao-item"
+              data-acao="levantar"
+              aria-label="Levantar"
+              data-som-clique="audio/button.mp3"
+              data-som-hover="audio/button_hover.mp3"
+            ></button>
+            <button
+              type="button"
+              class="acao-item"
+              data-acao="dorme"
+              aria-label="Dormir mais"
+              data-som-clique="audio/button.mp3"
+              data-som-hover="audio/button_hover.mp3"
+            ></button>
+            <button
+              type="button"
+              class="acao-item"
+              data-acao="scrollar"
+              aria-label="Scrollar"
+              data-som-clique="audio/button.mp3"
+              data-som-hover="audio/button_hover.mp3"
+            ></button>
+          </div>
+        </figure>
+      </div>
+
+      <section class="rota" id="rota-levantar" hidden>
+        <img
+          class="pagina-img"
+          src="imagens/SQ2L1.jpg"
+          width="1220"
+          height="1700"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          class="pagina-img"
+          src="imagens/SQ2L2.jpg"
+          width="1220"
+          height="1700"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          class="pagina-img"
+          src="imagens/SQ2L3.jpg"
+          width="1220"
+          height="1700"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          class="pagina-img"
+          src="imagens/SQ2L4.jpg"
+          width="1220"
+          height="1700"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          class="pagina-img"
+          src="imagens/SQ2L5.jpg"
+          width="1220"
+          height="1700"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          class="pagina-img"
+          src="imagens/SQ2L6.jpg"
+          width="1220"
+          height="1700"
+          alt=""
+          data-audio="audio/et.mp3"
+          data-audio-loop
+          data-audio-volume="0.3"
+          loading="lazy"
+          decoding="async"
+        />
+
+        <button
+          type="button"
+          class="reiniciar"
+          aria-label="Ler novamente"
+          data-som-clique="audio/button.mp3"
+          data-som-hover="audio/button_hover.mp3"
+          data-som-volume="0.5"
+        ></button>
+      </section>
+
+      <section class="rota" id="rota-dorme" hidden>
+        <img
+          class="pagina-img"
+          src="imagens/SQ3D1.jpg"
+          width="1220"
+          height="1700"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <img
+          class="pagina-img"
+          src="imagens/SQ3D2.png"
+          width="1220"
+          height="1700"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+
+        <div class="linha">
+          <figure class="quadro" style="--ar: 1220 / 398">
+            <img
+              src="imagens/SQE.png"
+              width="1220"
+              height="398"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        </div>
+
+        <div class="linha" style="--atraso: 1s">
+          <figure class="quadro" style="--ar: 1220 / 788">
+            <img
+              src="imagens/SQE2.png"
+              width="1220"
+              height="788"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+
+            <div class="sequencia-pericia">
+              <div class="quadro-pericia">
+                <div class="anel-pericia escondido">
+                  <svg
+                    class="anel-svg"
+                    viewBox="0 0 120 120"
+                    aria-hidden="true"
+                  >
+                    <circle class="anel-trilha" cx="60" cy="60" r="50" />
+                    <circle class="anel-zona" cx="60" cy="60" r="50" />
+                    <line
+                      class="anel-ponteiro"
+                      x1="60"
+                      y1="60"
+                      x2="106"
+                      y2="60"
+                    />
+                    <circle class="anel-centro" cx="60" cy="60" r="3" />
+                  </svg>
+                </div>
+
+                <button type="button" class="botao-pericia">Clique</button>
+
+                <p class="resultado" aria-live="polite"></p>
+              </div>
+            </div>
+          </figure>
+        </div>
+
+        <section class="final-pericia escondido" data-final="ruim">
+          <img
+            class="pagina-img"
+            src="imagens/explosao2.png"
+            width="1220"
+            height="788"
+            alt=""
+            data-audio="audio/explosao.mp3"
+            data-audio-loop
+            data-audio-volume="0.3"
+            loading="lazy"
+            decoding="async"
+          />
+        </section>
+
+        <section class="final-pericia escondido" data-final="bom">
+          <img
+            class="pagina-img"
+            src="imagens/SQB1.jpg"
+            width="1220"
+            height="1700"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+          <img
+            class="pagina-img"
+            src="imagens/SQB2.jpg"
+            width="1220"
+            height="1700"
+            alt=""
+            data-audio="audio/romance.mp3"
+            data-audio-loop
+            data-audio-volume="0.2"
+            loading="lazy"
+            decoding="async"
+          />
+        </section>
+
+        <button
+          type="button"
+          class="reiniciar"
+          aria-label="Ler novamente"
+          data-som-clique="audio/button.mp3"
+          data-som-hover="audio/button_hover.mp3"
+          data-som-volume="0.5"
+        ></button>
+      </section>
+
+      <section class="rota" id="rota-scrollar" hidden>
+        <div class="linha">
+          <figure class="quadro" style="--ar: 1220 / 520">
+            <img
+              src="imagens/SQ4S1.png"
+              width="1220"
+              height="520"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        </div>
+
+        <figure class="quadro quadro-scroll-cheio">
+          <div class="celular-rolagem">
+            <img
+              class="celular-post"
+              src="imagens/scroll1.png"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="celular-post"
+              src="imagens/scroll2.png"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="celular-post"
+              src="imagens/scroll3.png"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="celular-post"
+              src="imagens/scroll4.png"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="celular-post"
+              src="imagens/scroll5.png"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="celular-post"
+              src="imagens/scroll6.png"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="celular-post"
+              src="imagens/scroll7.png"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="celular-post"
+              src="imagens/scroll8.png"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <img
+              class="celular-post"
+              src="imagens/scroll9.png"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+
+          <img
+            class="celular-moldura"
+            src="imagens/moldura.png"
+            alt=""
+            aria-hidden="true"
+          />
+        </figure>
+        <img
+          class="pagina-img"
+          src="imagens/SQ3D2.png"
+          width="1220"
+          height="1700"
+          alt=""
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="linha">
+          <figure class="quadro" style="--ar: 1220 / 398">
+            <img
+              src="imagens/SQE.png"
+              width="1220"
+              height="398"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        </div>
+
+        <div class="linha" style="--atraso: 1s">
+          <figure class="quadro" style="--ar: 1220 / 788">
+            <img
+              src="imagens/SQE2.png"
+              width="1220"
+              height="788"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+
+            <div class="sequencia-pericia">
+              <div class="quadro-pericia">
+                <div class="anel-pericia escondido">
+                  <svg
+                    class="anel-svg"
+                    viewBox="0 0 120 120"
+                    aria-hidden="true"
+                  >
+                    <circle class="anel-trilha" cx="60" cy="60" r="50" />
+                    <circle class="anel-zona" cx="60" cy="60" r="50" />
+                    <line
+                      class="anel-ponteiro"
+                      x1="60"
+                      y1="60"
+                      x2="106"
+                      y2="60"
+                    />
+                    <circle class="anel-centro" cx="60" cy="60" r="3" />
+                  </svg>
+                </div>
+
+                <button type="button" class="botao-pericia">Clique</button>
+
+                <p class="resultado" aria-live="polite"></p>
+              </div>
+            </div>
+          </figure>
+        </div>
+
+        <section class="final-pericia escondido" data-final="ruim">
+          <img
+            class="pagina-img"
+            src="imagens/explosao2.png"
+            width="1220"
+            height="788"
+            alt=""
+            data-audio="audio/explosao2.mp3"
+            data-audio-loop
+            data-audio-volume="0.3"
+            loading="lazy"
+            decoding="async"
+          />
+        </section>
+
+        <section class="final-pericia escondido" data-final="bom">
+          <img
+            class="pagina-img"
+            src="imagens/SQB1.jpg"
+            width="1220"
+            height="1700"
+            alt=""
+            loading="lazy"
+            decoding="async"
+          />
+          <img
+            class="pagina-img"
+            src="imagens/SQB2.jpg"
+            width="1220"
+            height="1700"
+            alt=""
+            data-audio="audio/romance.mp3"
+            data-audio-loop
+            data-audio-volume="0.2"
+            loading="lazy"
+            decoding="async"
+          />
+        </section>
+
+        <button
+          type="button"
+          class="reiniciar"
+          aria-label="Ler novamente"
+          data-som-clique="audio/button.mp3"
+          data-som-hover="audio/button_hover.mp3"
+          data-som-volume="0.5"
+        ></button>
+      </section>
+    </main>
+  </body>
+</html>
