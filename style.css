@@ -419,3 +419,19 @@ body.na-capa #largura {
     opacity: 1;
   }
 }
+@media (max-width: 720px) {
+  .quadro-armario {
+    aspect-ratio: auto; 
+  }
+
+  .gaveta {
+    height: auto;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: 1rem 0;
+  }
+
+  .acao-item {
+    width: min(280px, 85%);
+  }
+}
