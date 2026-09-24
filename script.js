@@ -2,22 +2,29 @@
   "use strict";
 
   const TEMPO_MS = 15_000;
-  const MS_POR_TIQUE = 100;
   const FAIXA_GATILHO = "-35% 0px -35% 0px";
-  const ROUPA_PADRAO = "roupa1";
+  const ACAO_PADRAO = "levantar";
+
+  const RODADAS_PERICIA_FINAL = 6;
+  const FRACAO_ARCO = 0.065;
+  const PAUSA_ENTRE_RODADAS_MS = 700;
+  const PAUSA_ANTES_DO_FINAL_MS = 900;
 
   const quadroArmario = document.getElementById("quadro-armario");
   const contador = document.getElementById("contador");
   const gaveta = document.getElementById("gaveta");
-
+  const cronometroWrapper = document.querySelector(".cronometro-wrapper");
+  const somAlarme = document.getElementById("som-alarme");
+  const capa = document.querySelector(".capa");
+  const botaoComecar = document.querySelector(".comecar");
+  const audiosPagina = new Map();
+  const sonsBotao = new Map();
   let escolhido = null;
-  let idCronometro = null;
+  let idFrame = null;
   let fimDoTempo = 0;
   let observerArmario = null;
 
-  let resetarPericia = () => {};
-
-  /* Animações de scroll */
+  /* Animações de scroll (fade-in das .linha) */
 
   const observerScroll = new IntersectionObserver(
     (entradas) => {
@@ -30,10 +37,8 @@
 
   function prepararAnimacoesScroll() {
     document.querySelectorAll(".linha").forEach((linha) => {
-      if (!linha.classList.contains("animar-scroll")) {
-        linha.classList.add("animar-scroll");
-        observerScroll.observe(linha);
-      }
+      linha.classList.add("animar-scroll");
+      observerScroll.observe(linha);
     });
   }
 
@@ -45,21 +50,98 @@
     });
   }
 
+  /* Som da página */
+
+  const observerAudio = new IntersectionObserver(
+    (entradas) => {
+      entradas.forEach((e) => {
+        const audio = audiosPagina.get(e.target);
+        if (!audio) return;
+
+        if (e.isIntersecting) {
+          audio.currentTime = 0;
+          audio.play().catch(() => {});
+        } else {
+          audio.pause();
+        }
+      });
+    },
+    { rootMargin: FAIXA_GATILHO },
+  );
+
+  document.querySelectorAll("[data-audio]").forEach((el) => {
+    const audio = new Audio(el.dataset.audio);
+    audio.preload = "none";
+    audio.loop = el.hasAttribute("data-audio-loop");
+    audio.volume = Number(el.dataset.audioVolume ?? 1);
+
+    audiosPagina.set(el, audio);
+    observerAudio.observe(el);
+  });
+
+  function pararAudiosPagina() {
+    audiosPagina.forEach((audio) => audio.pause());
+  }
+
+  /* Sons dos botões */
+
+  function tocarSom(src, volume = 1) {
+    let audio = sonsBotao.get(src);
+
+    if (!audio) {
+      audio = new Audio(src);
+      sonsBotao.set(src, audio);
+    }
+
+    audio.volume = volume;
+    audio.currentTime = 0;
+    audio.play().catch((err) => console.warn("Som falhou:", src, err.name));
+  }
+
+  function tocarSomBotao(alvo, atributo) {
+    const el = alvo.closest(`[${atributo}]`);
+    if (!el) return;
+    tocarSom(el.getAttribute(atributo), Number(el.dataset.somVolume ?? 1));
+  }
+
+  document.addEventListener("click", (e) => {
+    tocarSomBotao(e.target, "data-som-clique");
+  });
+
+  document.addEventListener("pointerover", (e) => {
+    if (e.pointerType !== "mouse") return;
+    const el = e.target.closest("[data-som-hover]");
+    if (!el || el.contains(e.relatedTarget)) return;
+    tocarSomBotao(el, "data-som-hover");
+  });
+
   /* Cronômetro */
+
+  function tocarAlarme() {
+    if (!somAlarme) return;
+    somAlarme.currentTime = 0;
+    somAlarme.play().catch(() => {});
+  }
+
+  function pararAlarme() {
+    if (!somAlarme) return;
+    somAlarme.pause();
+    somAlarme.currentTime = 0;
+  }
 
   function iniciarCronometro() {
     pararCronometro();
-
     fimDoTempo = performance.now() + TEMPO_MS;
-
-    tique();
-    idCronometro = setInterval(tique, MS_POR_TIQUE);
+    idFrame = requestAnimationFrame(tique);
+    tocarAlarme();
   }
 
   function pararCronometro() {
-    clearInterval(idCronometro);
-    idCronometro = null;
+    if (idFrame !== null) cancelAnimationFrame(idFrame);
+    idFrame = null;
     observerArmario?.disconnect();
+    pararAudiosPagina();
+    pararAlarme();
   }
 
   function tique() {
@@ -68,24 +150,43 @@
     desenharCronometro(resta);
 
     if (resta === 0) {
-      pararCronometro();
-      tempoEsgotado();
+      escolherAcao(ACAO_PADRAO);
+      return;
     }
+
+    idFrame = requestAnimationFrame(tique);
+  }
+
+  function formatarTempo(ms) {
+    const minutos = Math.floor(ms / 60000);
+    const segundos = Math.floor((ms % 60000) / 1000);
+    const milisegundos = Math.floor(ms % 1000);
+
+    const mm = String(minutos).padStart(2, "0");
+    const ss = String(segundos).padStart(2, "0");
+    const mmm = String(milisegundos).padStart(3, "0");
+
+    return `${mm}:${ss}.${mmm}`;
   }
 
   function desenharCronometro(resta) {
-    contador.textContent = (resta / 1000).toFixed(1).replace(".", ",");
+    contador.textContent = formatarTempo(resta);
   }
-
-  /* O cronômetro começa quando o quadro do armário entra na tela — não
-     tem mais nada pra abrir, as roupas já estão lá. */
 
   function armarCronometro() {
     observerArmario?.disconnect();
 
+    let primeiraChamada = true;
+
     observerArmario = new IntersectionObserver(
       (entradas) => {
-        if (!entradas[0].isIntersecting || escolhido) return;
+        const intersectando = entradas[0].isIntersecting;
+        if (primeiraChamada) {
+          primeiraChamada = false;
+          if (intersectando) return;
+        }
+
+        if (!intersectando || escolhido) return;
         observerArmario.disconnect();
         iniciarCronometro();
       },
@@ -93,20 +194,6 @@
     );
 
     observerArmario.observe(quadroArmario);
-  }
-
-  // Pra quando falhar no teste ele não aparecer os quadrinhos depois e da escolha de roupas
-  function pularArmario() {
-    if (escolhido) return;
-
-    escolhido = "falha";
-    pararCronometro();
-
-    document
-      .querySelectorAll(".pos-pericia")
-      .forEach((linha) => linha.classList.add("escondido"));
-
-    revelarRota("rota-roupa3");
   }
 
   /* Escolha e rotas */
@@ -119,84 +206,81 @@
       return;
     }
 
-    rota.classList.remove("escondido");
-    prepararAnimacoesScroll();
-
+    rota.hidden = false;
     requestAnimationFrame(() => rota.scrollIntoView({ block: "start" }));
   }
 
-  function escolherRoupa(idRoupa) {
+  function escolherAcao(acao) {
     if (escolhido) return;
 
-    escolhido = idRoupa;
+    escolhido = acao;
     pararCronometro();
     quadroArmario.classList.add("resolvida");
+    cronometroWrapper.classList.add("escondido");
 
-    revelarRota(`rota-${idRoupa}`);
-  }
-
-  function tempoEsgotado() {
-    if (escolhido) return;
-    escolherRoupa(ROUPA_PADRAO);
+    revelarRota(`rota-${acao}`);
   }
 
   gaveta.addEventListener("click", (e) => {
-    const item = e.target.closest(".roupa-item");
+    const item = e.target.closest(".acao-item");
     if (!item) return;
 
-    escolherRoupa(item.dataset.roupa);
+    escolherAcao(item.dataset.acao);
   });
-
-  /* Reinício */
 
   document.querySelectorAll(".reiniciar").forEach((botao) => {
     botao.addEventListener("click", resetarTudo);
   });
 
+  /* Capa */
+
+  botaoComecar?.addEventListener("click", (e) => {
+    e.preventDefault();
+    document.body.classList.remove("na-capa");
+    capa.classList.add("escondido");
+    scrollTo({ top: 0, behavior: "auto" });
+  });
+
   function resetarTudo() {
-    document
-      .querySelectorAll(".rota")
-      .forEach((rota) => rota.classList.add("escondido"));
+    document.querySelectorAll(".rota").forEach((rota) => {
+      rota.hidden = true;
+    });
 
     escolhido = null;
 
-    document
-      .querySelectorAll(".pos-pericia")
-      .forEach((linha) => linha.classList.remove("escondido"));
-
     quadroArmario.classList.remove("resolvida");
+    cronometroWrapper.classList.remove("escondido");
 
     pararCronometro();
     desenharCronometro(TEMPO_MS);
     reiniciarAnimacoesScroll();
 
-    resetarPericia();
+    sequenciasPericia.forEach((sequencia) => sequencia.reiniciar());
+
+    capa.classList.remove("escondido");
+    document.body.classList.add("na-capa");
 
     scrollTo({ top: 0, behavior: "auto" });
     armarCronometro();
   }
 
-  desenharCronometro(TEMPO_MS);
-  prepararAnimacoesScroll();
-  armarCronometro();
+  /* Skillcheck */
 
-  /* Teste de perícia */
-
-  const painelPericia = document.getElementById("teste-pericia");
-
-  if (painelPericia) {
+  function criarAnelPericia(
+    painel,
+    { fracaoArco, duracaoVoltaMs = 1600, aoResolver },
+  ) {
     const CENTRO = 60;
     const RAIO = 50;
     const CIRCUNFERENCIA = 2 * Math.PI * RAIO;
-    const FRACAO_ARCO = 0.2; // quanto do anel conta como acerto
-    const GRAUS_ARCO = FRACAO_ARCO * 360;
-    const DURACAO_VOLTA_MS = 1600; // tempo pra dar uma volta completa
+    const GRAUS_ARCO = fracaoArco * 360;
 
-    const anelWrapper = painelPericia.querySelector("#anel-pericia");
-    const zona = painelPericia.querySelector("#zona");
-    const ponteiro = painelPericia.querySelector("#ponteiro");
-    const botaoPericia = painelPericia.querySelector("#botao-pericia");
-    const resultadoPericia = painelPericia.querySelector("#resultado-pericia");
+    const anelWrapper = painel.querySelector(".anel-pericia");
+    const zona = painel.querySelector(".anel-zona");
+    const ponteiro = painel.querySelector(".anel-ponteiro");
+    const botao = painel.querySelector(".botao-pericia");
+    const resultado = painel.querySelector(".resultado");
+    const textoInicial = botao.textContent;
 
     let rodando = false;
     let idAnimacao = null;
@@ -227,27 +311,27 @@
       return angulo >= inicioZonaGraus || angulo <= fim - 360;
     }
 
-    function passoPericia(agora) {
-      const decorrido = (agora - inicioGiro) % DURACAO_VOLTA_MS;
-      anguloAtual = (decorrido / DURACAO_VOLTA_MS) * 360;
+    function passo(agora) {
+      const decorrido = (agora - inicioGiro) % duracaoVoltaMs;
+      anguloAtual = (decorrido / duracaoVoltaMs) * 360;
 
       ponteiro.setAttribute(
         "transform",
         `rotate(${anguloAtual} ${CENTRO} ${CENTRO})`,
       );
 
-      if (rodando) idAnimacao = requestAnimationFrame(passoPericia);
+      if (rodando) idAnimacao = requestAnimationFrame(passo);
     }
 
     function iniciarGiro() {
       anelWrapper.classList.remove("escondido");
-      botaoPericia.textContent = "Parar!";
+      botao.textContent = "Parar";
 
       sortearZona();
 
       rodando = true;
       inicioGiro = performance.now();
-      idAnimacao = requestAnimationFrame(passoPericia);
+      idAnimacao = requestAnimationFrame(passo);
     }
 
     function encerrarGiro() {
@@ -263,16 +347,18 @@
 
       encerrarGiro();
 
-      resultadoPericia.textContent = sucesso ? "Sucesso!" : "Falhou!";
-      painelPericia.classList.toggle("sucesso", sucesso);
-      painelPericia.classList.toggle("falha", !sucesso);
-      painelPericia.classList.add("resolvido");
+      tocarSom(sucesso ? "audio/sucess.mp3" : "audio/fail.mp3", 0.4);
 
-      if (!sucesso) pularArmario();
+      resultado.textContent = sucesso ? "Sucesso!" : "Falhou!";
+      painel.classList.toggle("sucesso", sucesso);
+      painel.classList.toggle("falha", !sucesso);
+      painel.classList.add("resolvido");
+
+      aoResolver?.(sucesso);
     }
 
-    botaoPericia.addEventListener("click", () => {
-      if (painelPericia.classList.contains("resolvido")) return;
+    botao.addEventListener("click", () => {
+      if (painel.classList.contains("resolvido") || botao.disabled) return;
 
       if (rodando) {
         pararEAvaliar();
@@ -281,18 +367,98 @@
       }
     });
 
-    function reiniciarPericia() {
+    function reiniciar(textoBotao = textoInicial) {
       encerrarGiro();
 
       anelWrapper.classList.add("escondido");
-      botaoPericia.textContent = "Testar perícia";
-      resultadoPericia.textContent = "";
-      painelPericia.classList.remove("sucesso", "falha", "resolvido");
+      botao.textContent = textoBotao;
+      resultado.textContent = "";
+      painel.classList.remove("sucesso", "falha", "resolvido");
 
       zona.removeAttribute("transform");
       ponteiro.removeAttribute("transform");
     }
 
-    resetarPericia = reiniciarPericia;
+    return { reiniciar, botao };
   }
+
+  function criarSequenciaPericia(container) {
+    const painel = container.querySelector(".quadro-pericia");
+    const rota = container.closest(".rota");
+
+    let rodada = 1;
+
+    function esconderFinais() {
+      rota
+        ?.querySelectorAll(".final-pericia")
+        .forEach((secao) => secao.classList.add("escondido"));
+    }
+
+    function concluir(final) {
+      container.classList.add("escondido");
+      rota?.classList.remove("testando-pericia");
+
+      const secaoFinal = rota?.querySelector(
+        `.final-pericia[data-final="${final}"]`,
+      );
+      if (!secaoFinal) return;
+
+      secaoFinal.classList.remove("escondido");
+      requestAnimationFrame(() =>
+        secaoFinal.scrollIntoView({ block: "start" }),
+      );
+    }
+
+    const anel = criarAnelPericia(painel, {
+      fracaoArco: FRACAO_ARCO,
+      aoResolver: (sucesso) => {
+        if (!sucesso) {
+          setTimeout(() => concluir("ruim"), PAUSA_ANTES_DO_FINAL_MS);
+          return;
+        }
+
+        if (rodada >= RODADAS_PERICIA_FINAL) {
+          setTimeout(() => concluir("bom"), PAUSA_ANTES_DO_FINAL_MS);
+          return;
+        }
+
+        rodada++;
+
+        anel.botao.disabled = true;
+        setTimeout(() => {
+          anel.reiniciar("Próxima tentativa");
+          anel.botao.disabled = false;
+        }, PAUSA_ENTRE_RODADAS_MS);
+      },
+    });
+
+    anel.botao.addEventListener("click", () =>
+      painel.classList.add("em-teste"),
+    );
+
+    function reiniciar() {
+      painel.classList.remove("em-teste");
+      rodada = 1;
+
+      rota?.classList.add("testando-pericia");
+      anel.reiniciar();
+      anel.botao.disabled = false;
+      container.classList.remove("escondido");
+      esconderFinais();
+    }
+
+    reiniciar();
+
+    return { reiniciar };
+  }
+
+  const sequenciasPericia = Array.from(
+    document.querySelectorAll(".sequencia-pericia"),
+  ).map(criarSequenciaPericia);
+
+  /* Início */
+
+  desenharCronometro(TEMPO_MS);
+  prepararAnimacoesScroll();
+  armarCronometro();
 })();
