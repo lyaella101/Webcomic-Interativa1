@@ -70,7 +70,7 @@ body.na-capa #largura {
 /* Largura: tamanho de todos os quadros juntos */
 
 #largura {
-  width: min(1220px, 94vw);
+  width: min(1220px, 94vw, calc(100svh * 1220 / 1700));
   margin: 0 auto;
   padding: 0 0 40vh;
 }
