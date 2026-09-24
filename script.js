@@ -6,7 +6,7 @@
   const ACAO_PADRAO = "levantar";
 
   const RODADAS_PERICIA_FINAL = 6;
-  const FRACAO_ARCO = 0.065;
+  const FRACAO_ARCO = 0.07;
   const PAUSA_ENTRE_RODADAS_MS = 700;
   const PAUSA_ANTES_DO_FINAL_MS = 900;
 
