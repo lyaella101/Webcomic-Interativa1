@@ -6,7 +6,7 @@
   const ACAO_PADRAO = "levantar";
 
   const RODADAS_PERICIA_FINAL = 6;
-  const FRACAO_ARCO = 0.07;
+  const FRACAO_ARCO = 0.2;
   const PAUSA_ENTRE_RODADAS_MS = 700;
   const PAUSA_ANTES_DO_FINAL_MS = 900;
 
@@ -208,6 +208,12 @@
 
     rota.hidden = false;
     requestAnimationFrame(() => rota.scrollIntoView({ block: "start" }));
+
+    travasCelular
+      .filter((trava) => trava.rota === rota)
+      .forEach((trava) => trava.reiniciar());
+
+    requestAnimationFrame(() => rota.scrollIntoView({ block: "start" }));
   }
 
   function escolherAcao(acao) {
@@ -256,6 +262,7 @@
     reiniciarAnimacoesScroll();
 
     sequenciasPericia.forEach((sequencia) => sequencia.reiniciar());
+    travasCelular.forEach((trava) => trava.reiniciar());
 
     capa.classList.remove("escondido");
     document.body.classList.add("na-capa");
@@ -456,6 +463,60 @@
     document.querySelectorAll(".sequencia-pericia"),
   ).map(criarSequenciaPericia);
 
+  function criarTravaCelular(quadro) {
+    const rolagem = quadro.querySelector(".celular-rolagem");
+    const final = quadro.querySelector(".celular-final");
+    const rota = quadro.closest(".rota");
+    if (!rolagem || !rota) return { reiniciar() {} };
+
+    let bloco = quadro;
+    while (bloco.parentElement && bloco.parentElement !== rota) {
+      bloco = bloco.parentElement;
+    }
+
+    function seguintes() {
+      const lista = [];
+      let el = bloco.nextElementSibling;
+      while (el) {
+        lista.push(el);
+        el = el.nextElementSibling;
+      }
+      return lista;
+    }
+
+    function chegouAoFim() {
+      if (rolagem.clientHeight === 0) return false;
+      return (
+        rolagem.scrollTop + rolagem.clientHeight >= rolagem.scrollHeight - 2
+      );
+    }
+
+    function liberar() {
+      final?.classList.add("visivel-final");
+      seguintes().forEach((el) => el.classList.remove("travado-celular"));
+    }
+
+    function travar() {
+      rolagem.scrollTo({ top: 0, behavior: "instant" });
+      final?.classList.remove("visivel-final");
+      seguintes().forEach((el) => el.classList.add("travado-celular"));
+    }
+    rolagem.addEventListener(
+      "scroll",
+      () => {
+        if (chegouAoFim()) liberar();
+      },
+      { passive: true },
+    );
+
+    travar();
+
+    return { reiniciar: travar, rota };
+  }
+
+  const travasCelular = Array.from(
+    document.querySelectorAll("[data-trava-celular]"),
+  ).map(criarTravaCelular);
   /* Início */
 
   desenharCronometro(TEMPO_MS);
